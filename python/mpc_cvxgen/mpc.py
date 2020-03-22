@@ -14,7 +14,7 @@ Reference Papers:
 import numpy as np
 import cvxpy
 from cvxpy.expressions import constants
-from pylot.control.mpc.utils import compute_curvature, Vehicle, Trajectory
+from .utils import compute_curvature, Vehicle, Trajectory
 
 
 class ModelPredictiveController:
@@ -158,7 +158,8 @@ class ModelPredictiveController:
         """
         is_converged = False
         predicted_state = self._predict_state()
-        horizon_x, horizon_y, horizon_vel, horizon_yaw, horizon_accel, horizon_steer, solved = \
+        horizon_x, horizon_y, horizon_vel, \
+            horizon_yaw, horizon_accel, horizon_steer, solved = \
             self._control(reference_state, predicted_state, reference_steer)
         iteration_difference = \
             np.linalg.norm(self.horizon_accel - horizon_accel, ord=1) + \
