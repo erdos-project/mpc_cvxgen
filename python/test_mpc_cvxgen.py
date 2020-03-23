@@ -1,6 +1,8 @@
 from mpc_cvxgen.mpc import ModelPredictiveController
+from mpc_cvxgen.mpc_cvxgen import ModelPredictiveControllerCVXGEN
 from mpc_cvxgen.utils import CubicSpline2D, global_config
 import numpy as np
+import time
 
 if __name__ == '__main__':
     test_wypts = np.asarray([
@@ -25,7 +27,10 @@ if __name__ == '__main__':
         'yaw_list': ref_yaws,  # Yaws [rad]
     }
     mpc = ModelPredictiveController(mpc_config)
+    start = time.time()
     mpc.step()
+    elapsed = time.time() - start
+    print('Elapsed time: {} s'.format(elapsed))
     mpc_solution = [
         mpc.solution.t_list[1],
         mpc.solution.x_list[1],
@@ -37,3 +42,19 @@ if __name__ == '__main__':
         mpc.solution.steer_list[0],
     ]
     print(mpc_solution)
+    mpc_cvxgen = ModelPredictiveControllerCVXGEN(mpc_config)
+    start = time.time()
+    mpc_cvxgen.step()
+    elapsed = time.time() - start
+    print('Elapsed time: {} s'.format(elapsed))
+    mpc_cvxgen_solution = [
+        mpc_cvxgen.solution.t_list[1],
+        mpc_cvxgen.solution.x_list[1],
+        mpc_cvxgen.solution.y_list[1],
+        mpc_cvxgen.solution.k_list[1],
+        mpc_cvxgen.solution.vel_list[1],
+        mpc_cvxgen.solution.yaw_list[1],
+        mpc_cvxgen.solution.accel_list[0],
+        mpc_cvxgen.solution.steer_list[0],
+    ]
+    print(mpc_cvxgen_solution)

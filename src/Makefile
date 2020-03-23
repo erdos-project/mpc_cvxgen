@@ -10,10 +10,10 @@ OPT = -Wall -Os
 # libmath is needed for sqrt, which is used only for reporting the gap. Can
 # remove if desired for production solvers..
 LDLIBS = -lm
-CFLAGS = $(OPT) $(INCLUDES)
+CFLAGS = $(OPT) $(INCLUDES) -fPIC -g
 CC = gcc
 .PHONY: all
-all: testsolver applysolver.o
+all: testsolver applysolver.so
 testsolver: solver.o matrix_support.o ldl.o testsolver.o util.o
 # Include util.o for random functions and easy matrix printing.
 #testsolver: solver.o matrix_support.o ldl.o util.o testsolver.o
@@ -23,6 +23,8 @@ ldl.o: solver.h
 util.o: solver.h
 testsolver.o: solver.h
 applysolver.o: solver.h
+applysolver.so: applysolver.o solver.o matrix_support.o ldl.o testsolver.o util.o
+	$(CC) -shared $^ -o $@
 .PHONY : clean
 clean :
-	-rm -f *.o testsolver
+	-rm -f *.o *.so testsolver
