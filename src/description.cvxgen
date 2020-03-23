@@ -1,4 +1,4 @@
-# Produced by CVXGEN, 2020-02-24 13:45:01 -0500.
+# Produced by CVXGEN, 2020-03-22 19:57:34 -0400.
 # CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com.
 # The code in this file is Copyright (C) 2006-2017 Jacob Mattingley.
 # CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial
@@ -10,32 +10,36 @@
 dimensions
   m = 2  # inputs.
   n = 4  # states.
-  T = 10  # horizon.
+  T = 5  # horizon.
 end
 
 parameters
   A (n,n)  # dynamics matrix.
   B (n,m)  # transfer matrix.
+  C (n)  # bias matrix
   Q (n,n) psd  # state cost.
   Q_final (n,n) psd  # final state cost.
   R (m,m) psd  # input cost.
+  R_diff (m,m) psd  # input change cost.
   x[0] (n)  # initial state.
-  x_ref[t] (n), t=1..T+1  # reference trajectory.
-  x_max nonnegative  # range limit.
-  u_max nonnegative  # amplitude limit.
+  x_ref[t] (n), t=1..T  # reference trajectory.
+  x_max nonnegative  # range max.
+  x_min nonpositive  # range min.
+  u_max nonnegative  # amplitude max.
+  u_min nonpositive  # amplitude min.
   S nonnegative  # slew rate limit.
 end
 
 variables
-  x[t] (n), t=1..T+1  # state.
-  u[t] (m), t=0..T  # input.
+  x[t] (n), t=1..T  # state.
+  u[t] (m), t=0..T-1  # input.
 end
 
 minimize
-  quad(u[0], R) + sum[t=1..T](quad(x[t]-x_ref[t], Q) + quad(u[t], R)) + quad(x[T+1]-x_ref[T+1], Q_final)
+  quad(u[0], R) + sum[t=1..T-1](quad(x[t]-x_ref[t], Q) + quad(u[t], R)) + quad(x[T]-x_ref[T], Q_final) + sum[t=0..T-2](quad(u[t+1]-u[t], R_diff))
 subject to
-  x[t+1] == A*x[t] + B*u[t], t=0..T  # dynamics constraints.
-  abs(x[t]) <= x_max, t=1..T+1  # maximum state box constraint.
-  abs(u[t]) <= u_max, t=0..T  # maximum input box constraint.
-  norminf(u[t+1] - u[t]) <= S, t=0..T-1  # slew rate constraint.
+  x[t+1] == A*x[t] + B*u[t] + C, t=0..T-1  # dynamics constraints.
+  x_min <= x[t] <= x_max, t=1..T  # maximum state box constraint.
+  u_min <= u[t] <= u_max, t=0..T-1  # maximum input box constraint.
+  abs(u[t+1][1] - u[t][1]) <= S, t=0..T-2  # slew rate constraint.
 end

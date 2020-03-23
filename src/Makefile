@@ -1,4 +1,4 @@
-# Produced by CVXGEN, 2020-02-24 13:45:01 -0500.
+# Produced by CVXGEN, 2020-03-22 19:57:34 -0400.
 # CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com.
 # The code in this file is Copyright (C) 2006-2017 Jacob Mattingley.
 # CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial
@@ -13,7 +13,7 @@ LDLIBS = -lm
 CFLAGS = $(OPT) $(INCLUDES)
 CC = gcc
 .PHONY: all
-all: testsolver
+all: testsolver applysolver.o
 testsolver: solver.o matrix_support.o ldl.o testsolver.o util.o
 # Include util.o for random functions and easy matrix printing.
 #testsolver: solver.o matrix_support.o ldl.o util.o testsolver.o
@@ -22,6 +22,7 @@ matrix_support.o: solver.h
 ldl.o: solver.h
 util.o: solver.h
 testsolver.o: solver.h
+applysolver.o: solver.h
 .PHONY : clean
 clean :
 	-rm -f *.o testsolver

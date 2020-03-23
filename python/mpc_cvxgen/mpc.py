@@ -172,7 +172,7 @@ class ModelPredictiveController:
 
     def _predict_state(self):
         """
-        Propogate controls through the horizon to predict the next state.
+        Propagate controls through the horizon to predict the next state.
 
         :return: predicted state at end of horizon
         """
